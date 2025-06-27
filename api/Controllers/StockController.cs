@@ -49,4 +49,27 @@ public class StockController : ControllerBase
     
     return CreatedAtAction(nameof(GetStockById), new {id = stockModel.Id}, stockModel.ToStockDto());
   }
+
+  [HttpPut]
+  [Route("{id}")] // [ Route( "api/stock/{id}" )]
+  public IActionResult Update([FromRoute] int id, [FromBody] UpdateStockRequestDto updateStock)
+  {
+    var stockModel = _context.Stocks.FirstOrDefault(s => s.Id == id);
+
+    if (stockModel == null)
+    {
+      return NotFound();
+    }
+    
+    stockModel.Symbol = updateStock.Symbol;
+    stockModel.CompanyName = updateStock.CompanyName;
+    stockModel.Purchase = updateStock.Purchase;
+    stockModel.LastDiv = updateStock.LastDiv;
+    stockModel.Industry = updateStock.Industry;
+    stockModel.MarketCap = updateStock.MarketCap;
+    
+    _context.SaveChanges();
+    
+    return Ok(stockModel.ToStockDto());
+  }
 }
