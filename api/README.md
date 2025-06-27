@@ -10,4 +10,7 @@ Database tables are not a format that software developer could work with. Thats 
 
 What Entity Framework is going to do, is Entity Framework is to take database tables and turn them into objects. One object is represantation of **one row** from the database.
 
+### DTO
+
+**DTO** stands for Data Transfer Object. In the context of .NET Core, and making APIs, it is about Request/Response. Many times we do not want to return everything to the user but limited data. E.g. password.
 
