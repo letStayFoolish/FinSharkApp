@@ -4,13 +4,10 @@ using Microsoft.EntityFrameworkCore;
 namespace api.Data;
 
 // Inherit from DbContext
-public class ApplicationDBContext : DbContext
+public class ApplicationDbContext(DbContextOptions dbContextOptions) : DbContext(dbContextOptions)
 {
-  public ApplicationDBContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
-  {
-    // base allows us to pass up our dbcontext into db context
-  }
-  
+  // base allows us to pass up our dbcontext into db context
+
   // adding tables
   // DbSet -> grabbing something from database: manipulating the whole Stock table
   public DbSet<Stock> Stocks { get; set; }

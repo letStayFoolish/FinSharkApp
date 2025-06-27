@@ -11,11 +11,8 @@ builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 // Adding DB Context
-builder.Services.AddDbContext<ApplicationDBContext>(options =>
-{
-  // Configure the context to use Microsoft SQL Server - search through our appsettings.json.
-  options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
+// Configures the context to use Microsoft SQL Server - search through our appsettings.json.
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
