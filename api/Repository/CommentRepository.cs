@@ -7,12 +7,13 @@ namespace api.Repository;
 
 public class CommentRepository : ICommentRepository
 {
+  // Dependecy Injection in action
   private readonly ApplicationDbContext _context;
-
   public CommentRepository(ApplicationDbContext context)
   {
     _context = context;
   }
+  
   public async Task<List<Comment>> GetAllAsync()
   {
     return await _context.Comments.ToListAsync();

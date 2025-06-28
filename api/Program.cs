@@ -18,7 +18,8 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 
 // Adding DB Context
 // Configures the context to use Microsoft SQL Server - search through our appsettings.json.
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+  options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IStockRepository, StockRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 

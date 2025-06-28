@@ -24,6 +24,7 @@ public static class CommentMapper
       Title = commentDto.Title,
       Content = commentDto.Content,
       StockId = stockId
+      // the rest is added automatically by the C# program as we set it in Comment model
     };
   }
 }

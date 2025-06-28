@@ -53,4 +53,13 @@ Very repetitive code turns to abstraction, using **Repository pattern**.
 
 - **Analogy**:
     - Imagine a restaurant: You sit at your table (controller), and the waiter (DI container) brings the food (dependency) you ordered. You don’t go to the kitchen (implementation) yourself.
+
+ Example with `CommentController`:
+- Interfaces are being injected into the `CommentController` using its constructor;
+- The dependencies (`ICommentRepository`, `IStockRepository`) are provided by the DI container when creating an instance of `CommentController`;
+- For example:
+```csharp
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+```
+- `AddScoped()` method registers the dependencies in the DI container and ensures that a new instance of the service is created for each HTTP request.
  
