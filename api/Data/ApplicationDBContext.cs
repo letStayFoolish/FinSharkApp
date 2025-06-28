@@ -6,7 +6,7 @@ namespace api.Data;
 // Inherit from DbContext
 public class ApplicationDbContext(DbContextOptions dbContextOptions) : DbContext(dbContextOptions)
 {
-  // base allows us to pass up our dbcontext into db context
+  // base allows us to pass up our db context into db context
 
   // adding tables
   // DbSet -> grabbing something from database: manipulating the whole Stock table
