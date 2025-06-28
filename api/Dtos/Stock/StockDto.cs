@@ -1,4 +1,6 @@
-﻿namespace api.Dtos.Stock;
+﻿using api.Dtos.Comment;
+
+namespace api.Dtos.Stock;
 
 public class StockDto
 {
@@ -10,5 +12,7 @@ public class StockDto
   public decimal LastDiv { get; set; }
   public string Industry { get; set; } = string.Empty;
   public long MarketCap { get; set; }
-  // Comments are secret
+  // Comments are secret (first part of the tutorial)
+  // Now we can show comments
+  public List<CommentDto> Comments { get; set; }
 }
