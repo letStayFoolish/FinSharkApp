@@ -23,7 +23,7 @@ public class StockController : ControllerBase
   }
 
   [HttpGet] // read
-  public async Task<IActionResult> GetStocks()
+  public async Task<IActionResult> GetAllStocks()
   {
     // without ToList - returning list as an object (Deffer execution);
     var stocks = await _stockRepository.GetAllAsync();
@@ -35,7 +35,7 @@ public class StockController : ControllerBase
   [HttpGet("{id}")] // read by the id (id from query)
   public async Task<IActionResult> GetStockById([FromRoute] int id)
   {
-    var stock = await _context.Stocks.FindAsync(id);
+    var stock = await _stockRepository.GetByIdAsync(id);
 
     if (stock == null)
     {
@@ -50,31 +50,21 @@ public class StockController : ControllerBase
   {
     var stockModel = stockRequestDto.ToStockFromCreateDto();
 
-    await _context.AddAsync(stockModel);
-    await _context.SaveChangesAsync();
+    await _stockRepository.CreateAsync(stockModel);
 
     return CreatedAtAction(nameof(GetStockById), new { id = stockModel.Id }, stockModel.ToStockDto());
   }
 
   [HttpPut]
   [Route("{id}")] // [ Route( "api/stock/{id}" )]
-  public async  Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateStockRequestDto updateStock)
+  public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateStockRequestDto updateStock)
   {
-    var stockModel = await _context.Stocks.FirstOrDefaultAsync(s => s.Id == id);
+    var stockModel = await _stockRepository.UpdateAsync(id, updateStock);
 
     if (stockModel == null)
     {
       return NotFound();
     }
-
-    stockModel.Symbol = updateStock.Symbol;
-    stockModel.CompanyName = updateStock.CompanyName;
-    stockModel.Purchase = updateStock.Purchase;
-    stockModel.LastDiv = updateStock.LastDiv;
-    stockModel.Industry = updateStock.Industry;
-    stockModel.MarketCap = updateStock.MarketCap;
-
-    await _context.SaveChangesAsync();
 
     return Ok(stockModel.ToStockDto());
   }
@@ -84,16 +74,27 @@ public class StockController : ControllerBase
   public async Task<IActionResult> Delete([FromRoute] int id)
   {
     // Find an existing stock object
-    var stockModel = await _context.Stocks.FirstOrDefaultAsync(s => s.Id == id);
+    var stockModel = await _stockRepository.DeleteAsync(id);
 
     if (stockModel == null)
     {
       return NotFound();
     }
 
-    _context.Remove(stockModel);
-    await _context.SaveChangesAsync();
-
     return NoContent();
+  }
+  
+  [HttpDelete]
+  public async Task<IActionResult> DeleteAll()
+  {
+    
+    var sucess = await _stockRepository.DeleteAllAsync();
+
+    if (sucess)
+    {
+      return NoContent();
+    }
+
+    return StatusCode(StatusCodes.Status500InternalServerError, "Failed to delete records.\n");
   }
 }
