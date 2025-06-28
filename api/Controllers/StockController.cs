@@ -1,5 +1,6 @@
 ﻿using api.Data;
 using api.Dtos.Stock;
+using api.Interfaces;
 using api.Mappers;
 using api.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -13,17 +14,19 @@ public class StockController : ControllerBase
 {
   // We do not want to leave context mutable
   private readonly ApplicationDbContext _context;
+  private readonly IStockRepository _stockRepository;
 
-  public StockController(ApplicationDbContext context)
+  public StockController(ApplicationDbContext context, IStockRepository stockRepository)
   {
     _context = context;
+    _stockRepository = stockRepository;
   }
 
   [HttpGet] // read
   public async Task<IActionResult> GetStocks()
   {
     // without ToList - returning list as an object (Deffer execution);
-    var stocks = await _context.Stocks.ToListAsync();
+    var stocks = await _stockRepository.GetAllAsync();
     var stockDto = stocks.Select(s => s.ToStockDto());
 
     return Ok(stockDto);
