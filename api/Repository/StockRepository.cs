@@ -82,4 +82,9 @@ public class StockRepository : IStockRepository
     
     return true;
   }
+
+  public async Task<bool> StockExists(int id)
+  {
+    return await _context.Stocks.AnyAsync(stock => stock.Id == id);
+  }
 }
