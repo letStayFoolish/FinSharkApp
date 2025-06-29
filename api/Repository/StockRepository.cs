@@ -1,5 +1,6 @@
 ﻿using api.Data;
 using api.Dtos.Stock;
+using api.Helpers;
 using api.Interfaces;
 using api.Mappers;
 using api.Models;
@@ -17,10 +18,24 @@ public class StockRepository : IStockRepository
     _context = context;
   }
 
-  public async Task<List<Stock>> GetAllAsync()
+  public async Task<List<Stock>> GetAllAsync(QueryObject query)
   {
-   return await _context.Stocks.Include(item => item.Comments).ToListAsync();;
-    // var stockDto = stocks.Select(s => s.ToStockDto());
+    // before adding filtering functionality:
+   // return await _context.Stocks.Include(item => item.Comments).ToListAsync();
+    // After adding filtering:
+    var stocks =  _context.Stocks.Include(item => item.Comments).AsQueryable();
+
+    if (!string.IsNullOrWhiteSpace(query.CompanyName))
+    {
+      stocks = stocks.Where(s => s.CompanyName.Contains(query.CompanyName));
+    }
+
+    if (!string.IsNullOrWhiteSpace(query.Symbol))
+    {
+      stocks = stocks.Where(s => s.Symbol.Contains(query.Symbol));
+    }
+    
+    return await stocks.ToListAsync();
   }
 
   public async Task<Stock?> GetByIdAsync(int id)

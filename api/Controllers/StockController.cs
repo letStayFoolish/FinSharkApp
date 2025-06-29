@@ -1,5 +1,6 @@
 ﻿using api.Data;
 using api.Dtos.Stock;
+using api.Helpers;
 using api.Interfaces;
 using api.Mappers;
 using api.Models;
@@ -23,7 +24,7 @@ public class StockController : ControllerBase
   }
 
   [HttpGet] // read
-  public async Task<IActionResult> GetAllStocks()
+  public async Task<IActionResult> GetAllStocks([FromQuery] QueryObject query)
   {
     if (!ModelState.IsValid)
     {
@@ -31,7 +32,7 @@ public class StockController : ControllerBase
     }
 
     // without ToList - returning list as an object (Deffer execution);
-    var stocks = await _stockRepository.GetAllAsync();
+    var stocks = await _stockRepository.GetAllAsync(query);
     var stockDto = stocks.Select(s => s.ToStockDto());
 
     return Ok(stockDto);

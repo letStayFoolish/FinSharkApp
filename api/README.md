@@ -85,4 +85,8 @@ Inside DTOs, put **Data Validation Annotations** on top of our actual properties
 Recommendation: Never put Data Validation Annotations inside a real model! It will apply globally.
 `[Required]`, `[MinLength(int, ErrorMessage = string)]`, `[MaxLength(int, ErrorMessage = string)]`, `[Range(1, 1000)]`
 
- 
+## Filtering
+
+`ToList()` is very important, because it is what generates an SQL - pretty much it fires a gun to the db to get data back.
+
+To defer this, we have `AsQueryable()` will delay firing SQL gun - so we can do filtering, limiting, or something else before we get the data.
