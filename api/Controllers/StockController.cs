@@ -25,6 +25,11 @@ public class StockController : ControllerBase
   [HttpGet] // read
   public async Task<IActionResult> GetAllStocks()
   {
+    if (!ModelState.IsValid)
+    {
+      return BadRequest(ModelState);
+    }
+
     // without ToList - returning list as an object (Deffer execution);
     var stocks = await _stockRepository.GetAllAsync();
     var stockDto = stocks.Select(s => s.ToStockDto());
@@ -32,7 +37,7 @@ public class StockController : ControllerBase
     return Ok(stockDto);
   }
 
-  [HttpGet("{id}")] // read by the id (id from query)
+  [HttpGet("{id:int}")] // read by the id (id from query)
   public async Task<IActionResult> GetStockById([FromRoute] int id)
   {
     var stock = await _stockRepository.GetByIdAsync(id);
@@ -48,6 +53,11 @@ public class StockController : ControllerBase
   [HttpPost]
   public async Task<IActionResult> Create([FromBody] CreateStockRequestDto stockRequestDto)
   {
+    if (!ModelState.IsValid)
+    {
+      return BadRequest(ModelState);
+    }
+
     var stockModel = stockRequestDto.ToStockFromCreateDto();
 
     await _stockRepository.CreateAsync(stockModel);
@@ -56,9 +66,14 @@ public class StockController : ControllerBase
   }
 
   [HttpPut]
-  [Route("{id}")] // [ Route( "api/stock/{id}" )]
+  [Route("{id:int}")] // [ Route( "api/stock/{id}" )]
   public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateStockRequestDto updateStock)
   {
+    if (!ModelState.IsValid)
+    {
+      return BadRequest(ModelState);
+    }
+
     var stockModel = await _stockRepository.UpdateAsync(id, updateStock);
 
     if (stockModel == null)
@@ -70,9 +85,14 @@ public class StockController : ControllerBase
   }
 
   [HttpDelete]
-  [Route("{id}")]
+  [Route("{id:int}")]
   public async Task<IActionResult> Delete([FromRoute] int id)
   {
+    if (!ModelState.IsValid)
+    {
+      return BadRequest(ModelState);
+    }
+
     // Find an existing stock object
     var stockModel = await _stockRepository.DeleteAsync(id);
 
@@ -83,14 +103,18 @@ public class StockController : ControllerBase
 
     return NoContent();
   }
-  
+
   [HttpDelete]
   public async Task<IActionResult> DeleteAll()
   {
-    
-    var sucess = await _stockRepository.DeleteAllAsync();
+    if (!ModelState.IsValid)
+    {
+      return BadRequest(ModelState);
+    }
 
-    if (sucess)
+    var success = await _stockRepository.DeleteAllAsync();
+
+    if (success)
     {
       return NoContent();
     }

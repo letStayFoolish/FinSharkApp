@@ -14,7 +14,9 @@ public class CommentController : ControllerBase
 {
   // DI
   private readonly ICommentRepository _commentRepository;
+
   private readonly IStockRepository _stockRepository;
+
   // Interfaces are being injected into the CommentController using its constructor
   // The dependencies (ICommentRepository, IStockRepository) are provided by the DI container when creating an instance of CommentController
   // e.g. builder.Services.AddScoped<ICommentRepository, CommentRepository>();
@@ -28,6 +30,11 @@ public class CommentController : ControllerBase
   [HttpGet] // read all comments
   public async Task<IActionResult> GetAllComments()
   {
+    if (!ModelState.IsValid)
+    {
+      return BadRequest(ModelState);
+    }
+
     var comments = await _commentRepository.GetAllAsync();
     // DTO Comments: Mapping through each of comment and turn it to DTO comment (we do not want to show all to the end-user)
     var commentsDto = comments.Select(c => c.ToCommentDto());
@@ -35,9 +42,14 @@ public class CommentController : ControllerBase
   }
 
   [HttpGet]
-  [Route("{id}")] // or [HttpGet("{ id }")]
+  [Route("{id:int}")] // or [HttpGet("{ id }")]
   public async Task<IActionResult> GetCommentById([FromRoute] int id)
   {
+    if (!ModelState.IsValid)
+    {
+      return BadRequest(ModelState);
+    }
+
     var existingComment = await _commentRepository.GetByIdAsync(id);
 
     if (existingComment == null)
@@ -49,9 +61,14 @@ public class CommentController : ControllerBase
   }
 
   [HttpPost]
-  [Route("{stockId}")]
-  public async Task<IActionResult> Create([FromRoute] int stockId, [FromBody]CreateCommentDto commentDto)
+  [Route("{stockId:int}")]
+  public async Task<IActionResult> Create([FromRoute] int stockId, [FromBody] CreateCommentDto commentDto)
   {
+    if (!ModelState.IsValid)
+    {
+      return BadRequest(ModelState);
+    }
+
     // find existing stock
     var existingStock = await _stockRepository.StockExists(stockId);
     if (!existingStock)
@@ -68,23 +85,34 @@ public class CommentController : ControllerBase
   }
 
   [HttpPut]
-  [Route("{id}")]
-  public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCommentRequestDto updateCommentRequestDto)
+  [Route("{id:int}")]
+  public async Task<IActionResult> Update([FromRoute] int id,
+    [FromBody] UpdateCommentRequestDto updateCommentRequestDto)
   {
+    if (!ModelState.IsValid)
+    {
+      return BadRequest(ModelState);
+    }
+
     var existingComment = await _commentRepository.UpdateAsync(id, updateCommentRequestDto.ToCommentFromUpdate());
 
     if (existingComment == null)
     {
       return NotFound("Comment not found");
     }
-    
+
     return Ok(existingComment.ToCommentDto());
   }
 
   [HttpDelete]
-  [Route("{id}")]
+  [Route("{id:int}")]
   public async Task<IActionResult> Delete([FromRoute] int id)
   {
+    if (!ModelState.IsValid)
+    {
+      return BadRequest(ModelState);
+    }
+
     var commentModel = await _commentRepository.DeleteAsync(id);
 
     if (commentModel == null)
@@ -93,6 +121,5 @@ public class CommentController : ControllerBase
     }
 
     return Ok(commentModel);
-
   }
 }

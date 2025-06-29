@@ -63,4 +63,26 @@ Very repetitive code turns to abstraction, using **Repository pattern**.
   builder.Services.AddScoped<ICommentRepository, CommentRepository>();
   ```
 - `AddScoped()` method registers the dependencies in the DI container and ensures that a new instance of the service is created for each HTTP request.
+## Data Validation
+
+### Data validation for URL and JSON (_from body_)
+
+For simple types, where we pass `string` instead of `int`:
+```csharp
+[HttpGet("{id}")]
+public async Task<IActionResult> GetById([FromRoute] int id) {}
+```
+This should not pass the validation, since we typed `id` as an `int` type value.
+```csharp
+[HttpGet("{id: int}")]
+public async Task<IActionResult> GetById([FromRoute] int id) {}
+```
+
+### Complex Forms of validation
+
+Inside DTOs, put **Data Validation Annotations** on top of our actual properties.
+
+Recommendation: Never put Data Validation Annotations inside a real model! It will apply globally.
+`[Required]`, `[MinLength(int, ErrorMessage = string)]`, `[MaxLength(int, ErrorMessage = string)]`, `[Range(1, 1000)]`
+
  
