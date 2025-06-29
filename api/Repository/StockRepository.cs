@@ -21,9 +21,9 @@ public class StockRepository : IStockRepository
   public async Task<List<Stock>> GetAllAsync(QueryObject query)
   {
     // before adding filtering functionality:
-   // return await _context.Stocks.Include(item => item.Comments).ToListAsync();
+    // return await _context.Stocks.Include(item => item.Comments).ToListAsync();
     // After adding filtering:
-    var stocks =  _context.Stocks.Include(item => item.Comments).AsQueryable();
+    var stocks = _context.Stocks.Include(item => item.Comments).AsQueryable();
 
     if (!string.IsNullOrWhiteSpace(query.CompanyName))
     {
@@ -34,7 +34,15 @@ public class StockRepository : IStockRepository
     {
       stocks = stocks.Where(s => s.Symbol.Contains(query.Symbol));
     }
-    
+
+    if (!string.IsNullOrWhiteSpace(query.SortBy))
+    {
+      if (query.SortBy.Equals("Symbol", StringComparison.OrdinalIgnoreCase))
+      {
+        stocks = query.isDescending ? stocks.OrderByDescending(s => s.Symbol) : stocks.OrderBy(s => s.Symbol);
+      }
+    }
+
     return await stocks.ToListAsync();
   }
 
@@ -55,12 +63,12 @@ public class StockRepository : IStockRepository
   {
     var existingStock = await _context.Stocks.FirstOrDefaultAsync(s => s.Id == id);
 
-    
+
     if (existingStock == null)
     {
       return null;
     }
-    
+
     existingStock.Symbol = stockDto.Symbol;
     existingStock.CompanyName = stockDto.CompanyName;
     existingStock.Purchase = stockDto.Purchase;
@@ -71,7 +79,6 @@ public class StockRepository : IStockRepository
     await _context.SaveChangesAsync();
 
     return existingStock;
-
   }
 
   public async Task<Stock?> DeleteAsync(int id)
@@ -82,10 +89,10 @@ public class StockRepository : IStockRepository
     {
       return null;
     }
-    
+
     _context.Remove(stockModel);
     await _context.SaveChangesAsync();
-    
+
     return stockModel;
   }
 
@@ -94,7 +101,7 @@ public class StockRepository : IStockRepository
     var allStocks = await _context.Stocks.ToListAsync();
     _context.RemoveRange(allStocks);
     await _context.SaveChangesAsync();
-    
+
     return true;
   }
 
