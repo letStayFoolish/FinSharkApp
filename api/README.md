@@ -90,3 +90,7 @@ Recommendation: Never put Data Validation Annotations inside a real model! It wi
 `ToList()` is very important, because it is what generates an SQL - pretty much it fires a gun to the db to get data back.
 
 To defer this, we have `AsQueryable()` will delay firing SQL gun - so we can do filtering, limiting, or something else before we get the data.
+
+## Pagination
+
+Using `Skip(int)` and `Take(int)` in combination.
