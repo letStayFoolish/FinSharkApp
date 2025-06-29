@@ -1,4 +1,5 @@
 ﻿using api.Data;
+using api.Dtos.Comment;
 using api.Interfaces;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
@@ -31,5 +32,21 @@ public class CommentRepository : ICommentRepository
     await _context.SaveChangesAsync();
     
     return commentModel;
+  }
+
+  public async Task<Comment?> UpdateAsync(int id, UpdateCommentDto commentDto)
+  {
+    var existingComment = await _context.Comments.FirstOrDefaultAsync(c => c.Id == id);
+
+    if (existingComment == null)
+    {
+      return null;
+    }
+    
+    existingComment.Title = commentDto.Title;
+    existingComment.Content = commentDto.Content;
+
+    _context.SaveChangesAsync();
+    return existingComment;
   }
 }
