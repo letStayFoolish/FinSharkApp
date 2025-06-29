@@ -4,6 +4,7 @@ using api.Helpers;
 using api.Interfaces;
 using api.Mappers;
 using api.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,6 +25,7 @@ public class StockController : ControllerBase
   }
 
   [HttpGet] // read
+  [Authorize]
   public async Task<IActionResult> GetAllStocks([FromQuery] QueryObject query)
   {
     if (!ModelState.IsValid)

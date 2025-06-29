@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +19,33 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(option =>
+{
+  option.SwaggerDoc("v1", new OpenApiInfo { Title = "Demo API", Version = "v1" });
+  option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+  {
+    In = ParameterLocation.Header,
+    Description = "Please enter a valid token",
+    Name = "Authorization",
+    Type = SecuritySchemeType.Http,
+    BearerFormat = "JWT",
+    Scheme = "Bearer"
+  });
+  option.AddSecurityRequirement(new OpenApiSecurityRequirement
+  {
+    {
+      new OpenApiSecurityScheme
+      {
+        Reference = new OpenApiReference
+        {
+          Type=ReferenceType.SecurityScheme,
+          Id="Bearer"
+        }
+      },
+      new string[]{}
+    }
+  });
+});
 builder.Services.AddControllers();
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
   options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore); // prevents Object cycles

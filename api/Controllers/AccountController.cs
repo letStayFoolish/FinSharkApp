@@ -3,6 +3,7 @@ using api.Models;
 using api.Service;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace api.Controllers;
 
@@ -12,11 +13,46 @@ public class AccountController : ControllerBase
 {
   private readonly UserManager<AppUser> _userManager;
   private readonly ITokenService _tokenService;
+  private readonly SignInManager<AppUser> _signInManager;
 
-  public AccountController(UserManager<AppUser> userManager, ITokenService tokenService)
+  public AccountController(UserManager<AppUser> userManager, ITokenService tokenService,
+    SignInManager<AppUser> signInManager)
   {
     _userManager = userManager;
     _tokenService = tokenService;
+    _signInManager = signInManager;
+  }
+
+  [HttpPost("login")]
+  public async Task<IActionResult> Login(LoginDto loginDto)
+  {
+    if (!ModelState.IsValid)
+    {
+      return BadRequest(ModelState);
+    }
+
+    var existingUser = await _userManager.Users.FirstOrDefaultAsync(user => user.UserName == loginDto.Username);
+
+    if (existingUser == null)
+    {
+      return Unauthorized("Invalid username!");
+    }
+
+    var result = await _signInManager.CheckPasswordSignInAsync(existingUser, loginDto.Password, false);
+
+    if (!result.Succeeded)
+    {
+      return Unauthorized("Invalid password!");
+    }
+
+    return Ok(
+      new NewUserDto
+      {
+        UserName = existingUser.UserName,
+        Email = existingUser.Email,
+        Token = _tokenService.CreateToken(existingUser)
+      }
+    );
   }
 
   [HttpPost("register")]
