@@ -69,13 +69,13 @@ public class CommentController : ControllerBase
 
   [HttpPut]
   [Route("{id}")]
-  public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCommentDto commentDto)
+  public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCommentRequestDto updateCommentRequestDto)
   {
-    var existingComment = await _commentRepository.UpdateAsync(id, commentDto);
+    var existingComment = await _commentRepository.UpdateAsync(id, updateCommentRequestDto.ToCommentFromUpdate());
 
     if (existingComment == null)
     {
-      return NotFound();
+      return NotFound("Comment not found");
     }
     
     return Ok(existingComment.ToCommentDto());

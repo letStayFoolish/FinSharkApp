@@ -1,6 +1,7 @@
 ﻿using api.Data;
 using api.Dtos.Comment;
 using api.Interfaces;
+using api.Mappers;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,19 +35,19 @@ public class CommentRepository : ICommentRepository
     return commentModel;
   }
 
-  public async Task<Comment?> UpdateAsync(int id, UpdateCommentDto commentDto)
+  public async Task<Comment?> UpdateAsync(int id, Comment commentModel)
   {
-    var existingComment = await _context.Comments.FirstOrDefaultAsync(c => c.Id == id);
+    var existingComment = await _context.Comments.FindAsync(id);
 
     if (existingComment == null)
     {
       return null;
     }
     
-    existingComment.Title = commentDto.Title;
-    existingComment.Content = commentDto.Content;
+    existingComment.Title = commentModel.Title;
+    existingComment.Content = commentModel.Content;
 
-    _context.SaveChangesAsync();
+    await _context.SaveChangesAsync();
     return existingComment;
   }
 }

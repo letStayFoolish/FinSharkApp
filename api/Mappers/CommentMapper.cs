@@ -27,4 +27,14 @@ public static class CommentMapper
       // the rest is added automatically by the C# program as we set it in Comment model
     };
   }
+  
+  public static Comment ToCommentFromUpdate(this UpdateCommentRequestDto commentDto)
+  {
+    return new Comment
+    {
+      Title = commentDto.Title,
+      Content = commentDto.Content,
+      // the rest is added automatically by the C# program as we set it in Comment model
+    };
+  }
 }
