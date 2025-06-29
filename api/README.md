@@ -94,3 +94,23 @@ To defer this, we have `AsQueryable()` will delay firing SQL gun - so we can do 
 ## Pagination
 
 Using `Skip(int)` and `Take(int)` in combination.
+
+## Token Services
+### Claims vs. Roles
+
+**Roles** are more generic and old school.
+
+**Claims** don't require DB and very flexible.
+
+Microsoft has moved away from Roles.
+
+Claims are (just as Roles) key-value pairs of things that going to describe of what a user does or what a user can do.
+
+Flow:
+
+- When user do Login, submitting email and password - sending JWT to the server;
+- Claims Principal: when User is authenticated, Claims Principal is going to be created;
+- From Claims Principal we are going to get information about User such: email, timeZone, etc...
+
+Making `Service` folder. `Repository` folder is for DB calls, while on the other hand `Service` is for any kind of abstraction.
+
