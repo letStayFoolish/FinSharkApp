@@ -1,4 +1,5 @@
-# Title
+# Important Notes
+## These notes represent some of the key things on my path of learning ASP.NET Core
 
 ## ORM and Entity Framework
 
@@ -58,8 +59,8 @@ Very repetitive code turns to abstraction, using **Repository pattern**.
 - Interfaces are being injected into the `CommentController` using its constructor;
 - The dependencies (`ICommentRepository`, `IStockRepository`) are provided by the DI container when creating an instance of `CommentController`;
 - For example:
-```csharp
-builder.Services.AddScoped<ICommentRepository, CommentRepository>();
-```
+  ```csharp
+  builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+  ```
 - `AddScoped()` method registers the dependencies in the DI container and ensures that a new instance of the service is created for each HTTP request.
  
