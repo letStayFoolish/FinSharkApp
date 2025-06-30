@@ -157,20 +157,20 @@ This markdown file provides a comprehensive step-by-step guide to building a Web
 
 ## Screenshots and Visual Documentation
 
-### Screenshot 1: Application Overview
+### Screenshot 1: API Endpoints
 
 ![Application Overview](./Screens/screen-01.png)
-Overview of the main application interface and component structure.
+Documentation of available API endpoints and their respective HTTP methods.
 
-### Screenshot 2: Database Schema
+### Screenshot 2: API Endpoints
 
 ![Database Schema](./Screens/screen-02.png)
-Visual representation of the database schema and relationships between entities.
+Documentation of available API endpoints and their respective HTTP methods.
 
-### Screenshot 3: API Endpoints
+### Screenshot 3: Database Schema
 
 ![API Endpoints](./Screens/screen-03.png)
-Documentation of available API endpoints and their respective HTTP methods.
+Visual representation of the database schema and relationships between entities.
 
 ---
 

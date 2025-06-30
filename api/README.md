@@ -125,3 +125,20 @@ Great for "submodels", putting models within models.
 **User Generated Content**. E.g., When someone creates a new comment, we add info about what user created that comment, hence in this case user is submodel to a comment model.
 
 The actual difference between One-To-Many and One-To-One is that sumodel is going to have an **object** not **array**! No list, just `userId` and _navigation property_!
+
+## Screenshots and Visual Documentation
+
+### Screenshot 1: API Endpoints
+
+![Application Overview](./Screens/screen-01.png)
+Documentation of available API endpoints and their respective HTTP methods.
+
+### Screenshot 2: API Endpoints
+
+![Database Schema](./Screens/screen-02.png)
+Documentation of available API endpoints and their respective HTTP methods.
+
+### Screenshot 3: Database Schema
+
+![API Endpoints](./Screens/screen-03.png)
+Visual representation of the database schema and relationships between entities.
