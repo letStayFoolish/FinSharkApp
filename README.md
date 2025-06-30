@@ -348,15 +348,15 @@ This markdown file provides a comprehensive step-by-step guide to building a Web
 
 ### Screenshot 1: API Endpoints
 
-![Application Overview](./Screens/screen-01.png)
+![Application Overview](/Screens/screen-01.png)
 Documentation of available API endpoints and their respective HTTP methods.
 
 ### Screenshot 2: API Endpoints
 
-![Database Schema](./Screens/screen-02.png)
+![Database Schema](/Screens/screen-02.png)
 Documentation of available API endpoints and their respective HTTP methods.
 
 ### Screenshot 3: Database Schema
 
-![API Endpoints](./Screens/screen-03.png)
+![API Endpoints](/Screens/screen-03.png)
 Visual representation of the database schema and relationships between entities.
