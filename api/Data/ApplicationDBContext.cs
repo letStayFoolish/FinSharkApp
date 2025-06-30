@@ -16,10 +16,23 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>
   // DbSet -> grabbing something from database: manipulating the whole Stock table
   public DbSet<Stock> Stocks { get; set; }
   public DbSet<Comment> Comments { get; set; }
+  public DbSet<Portfolio> Portfolios { get; set; }
 
   protected override void OnModelCreating(ModelBuilder builder)
   {
     base.OnModelCreating(builder);
+
+    builder.Entity<Portfolio>(p => p.HasKey(p => new {p.AppUserId, p.StockId}));
+    // connect it to the table
+    builder.Entity<Portfolio>()
+      .HasOne(p => p.AppUser)
+      .WithMany(u => u.Portfolios)
+      .HasForeignKey(p => p.AppUserId);
+    
+    builder.Entity<Portfolio>()
+      .HasOne(p => p.Stock)
+      .WithMany(u => u.Portfolios)
+      .HasForeignKey(p => p.StockId);
     
     List<IdentityRole> roles = new List<IdentityRole>
     {

@@ -114,3 +114,6 @@ Flow:
 
 Making `Service` folder. `Repository` folder is for DB calls, while on the other hand `Service` is for any kind of abstraction.
 
+## Many-To-Many
+
+Do it with **Join Table**!
