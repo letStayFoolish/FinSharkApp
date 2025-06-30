@@ -36,4 +36,17 @@ public class PortfolioRepository : IPortfolioRepository
     await _context.SaveChangesAsync();
     return portfolioModel;
   }
+
+  public async Task<Portfolio?> DeleteAsync(AppUser appuser, string symbol)
+  {
+    var portfolioModel = await _context.Portfolios.FirstOrDefaultAsync(p => p.AppUserId == appuser.Id && p.Stock.Symbol == symbol);
+    if (portfolioModel == null)
+    {
+      return null;
+    }
+
+    _context.Portfolios.Remove(portfolioModel);
+    await _context.SaveChangesAsync();
+    return portfolioModel;
+  }
 }
