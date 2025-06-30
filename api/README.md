@@ -117,3 +117,11 @@ Making `Service` folder. `Repository` folder is for DB calls, while on the other
 ## Many-To-Many
 
 Do it with **Join Table**!
+
+## One-To-One
+
+Great for "submodels", putting models within models.
+
+**User Generated Content**. E.g., When someone creates a new comment, we add info about what user created that comment, hence in this case user is submodel to a comment model.
+
+The actual difference between One-To-Many and One-To-One is that sumodel is going to have an **object** not **array**! No list, just `userId` and _navigation property_!

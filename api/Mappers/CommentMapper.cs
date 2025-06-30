@@ -13,7 +13,8 @@ public static class CommentMapper
       Title = commentModel.Title,
       Content = commentModel.Content,
       CreatedOn = commentModel.CreatedOn,
-      StockId = commentModel.StockId
+      StockId = commentModel.StockId,
+      CreatedBy = commentModel.AppUser.UserName
     };
   }
   
@@ -23,7 +24,7 @@ public static class CommentMapper
     {
       Title = commentDto.Title,
       Content = commentDto.Content,
-      StockId = stockId
+      StockId = stockId,
       // the rest is added automatically by the C# program as we set it in Comment model
     };
   }

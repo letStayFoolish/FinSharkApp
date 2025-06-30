@@ -35,7 +35,7 @@ public class StockController : ControllerBase
 
     // without ToList - returning list as an object (Deffer execution);
     var stocks = await _stockRepository.GetAllAsync(query);
-    var stockDto = stocks.Select(s => s.ToStockDto());
+    var stockDto = stocks.Select(s => s.ToStockDto()).ToList();
 
     return Ok(stockDto);
   }

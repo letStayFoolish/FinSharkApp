@@ -23,7 +23,7 @@ public class StockRepository : IStockRepository
     // before adding filtering functionality:
     // return await _context.Stocks.Include(item => item.Comments).ToListAsync();
     // After adding filtering:
-    var stocks = _context.Stocks.Include(item => item.Comments).AsQueryable();
+    var stocks = _context.Stocks.Include(item => item.Comments).ThenInclude(c => c.AppUser).AsQueryable();
 
     if (!string.IsNullOrWhiteSpace(query.CompanyName))
     {

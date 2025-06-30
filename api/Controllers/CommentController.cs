@@ -1,7 +1,9 @@
 ﻿using api.Dtos.Comment;
+using api.Extensions;
 using api.Interfaces;
 using api.Mappers;
 using api.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers;
@@ -14,17 +16,18 @@ public class CommentController : ControllerBase
 {
   // DI
   private readonly ICommentRepository _commentRepository;
-
   private readonly IStockRepository _stockRepository;
+  private readonly UserManager<AppUser> _userManager;
 
   // Interfaces are being injected into the CommentController using its constructor
   // The dependencies (ICommentRepository, IStockRepository) are provided by the DI container when creating an instance of CommentController
   // e.g. builder.Services.AddScoped<ICommentRepository, CommentRepository>();
   // `AddScoped()` method registers the dependencies in the DI container and ensures that a new instance of the service is created for each HTTP request.
-  public CommentController(ICommentRepository commentRepository, IStockRepository stockRepository)
+  public CommentController(ICommentRepository commentRepository, IStockRepository stockRepository, UserManager<AppUser> userManager)
   {
     _commentRepository = commentRepository;
     _stockRepository = stockRepository;
+    _userManager = userManager;
   }
 
   [HttpGet] // read all comments
@@ -76,9 +79,12 @@ public class CommentController : ControllerBase
       return BadRequest("Stock does not exist");
     }
 
+    var username = User.GetUsername();
+    var appUser = await _userManager.FindByNameAsync(username);
+    
     // existing stock update comment property only
     var commentModel = commentDto.ToCommentFromCreate(stockId);
-
+    commentModel.AppUserId = appUser.Id;
     await _commentRepository.CreateAsync(commentModel);
 
     return CreatedAtAction(nameof(GetCommentById), new { id = commentModel.Id }, commentModel.ToCommentDto());
