@@ -149,9 +149,28 @@ DI facilitates the loose coupling of components and promotes modular design.
 
 This markdown file should serve as a comprehensive guide for understanding and contributing to the application. It ensures clarity, consistency, and traceability of development practices for future contributors.
 
+
+
 # Building a Web API from Scratch - Step-by-Step Guide
 
 This markdown file provides a comprehensive step-by-step guide to building a Web API application using ASP.NET Core. It covers all key stages from project setup to development and deployment.
+
+## Screenshots and Visual Documentation
+
+### Screenshot 1: Application Overview
+
+![Application Overview](./Screens/screen-01.png)
+Overview of the main application interface and component structure.
+
+### Screenshot 2: Database Schema
+
+![Database Schema](./Screens/screen-02.png)
+Visual representation of the database schema and relationships between entities.
+
+### Screenshot 3: API Endpoints
+
+![API Endpoints](./Screens/screen-03.png)
+Documentation of available API endpoints and their respective HTTP methods.
 
 ---
 
