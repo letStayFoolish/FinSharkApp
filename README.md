@@ -147,11 +147,7 @@ DI facilitates the loose coupling of components and promotes modular design.
 
 ---
 
-This markdown file should serve as a comprehensive guide for understanding and contributing to the application. It ensures clarity, consistency, and traceability of development practices for future contributors.
-
 # Building a Web API from Scratch - Step-by-Step Guide
-
-This markdown file provides a comprehensive step-by-step guide to building a Web API application using ASP.NET Core. It covers all key stages from project setup to development and deployment.
 
 ---
 
