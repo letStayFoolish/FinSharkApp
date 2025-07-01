@@ -1,366 +1,115 @@
-﻿# Development Guidelines and Documentation
+﻿# Important Notes
+## These notes represent some of the key things on my path of learning ASP.NET Core
 
-This document outlines the process and best practices followed during the development of the application. It serves as step-by-step guidance for revisiting or extending the project and includes documentation for key features with descriptive purposes.
+## ORM and Entity Framework
 
----
+Database tables are not a format that software developer could work with. Thats why we need (and have) ORM.
 
-## 1. Database Setup
+**ORM** Object Relational Mapper. In .NET we use **Entity Framework** as ORM.
 
-**Purpose:**
-The database layer forms the foundation for data management within the application, transforming relational data into entities.
+### Why do we need Entity Framework?
 
-**Steps:**
-1. Define a `DbContext` (`ApplicationDbContext`) class for database access.
-2. Set up `DbSet<T>` properties for each model representing a database table.
-3. Add the database connection string to `appsettings.json`.
-4. Register the `DbContext` in `Program.cs` using:
-   ```csharp
-   builder.Services.AddDbContext<ApplicationDbContext>(options =>
-       options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-   ```
-5. Use EF migrations to create or update the database schema:
-   ```bash
-   dotnet ef migrations add InitialMigration
-   dotnet ef database update
-   ```
+What Entity Framework is going to do, is Entity Framework is to take database tables and turn them into objects. One object is represantation of **one row** from the database.
 
----
+### DTO
 
-## 2. Defining Models (Entities)
+**DTO** stands for Data Transfer Object. In the context of .NET Core, and making APIs, it is about Request/Response. Many times we do not want to return everything to the user but limited data. E.g. password.
 
-**Purpose:**
-Models in the application map to database tables and encapsulate data required for application functionality.
+### POST
 
-**Steps:**
-- Create plain C# classes to represent entities.
-- Define navigation properties for relationships (One-To-Many, Many-To-Many, etc.).
-- Avoid placing validations or business logic directly in the entity classes; use DTOs and services to handle these.
+Using **Entity Framework**'s method `Add()`. `Add` will not instantly save to database, it is going to start tracking that object. `SaveChanges()` will actually add object to the db.
 
----
+## Code to an Interface == Code to an abstraction
 
-## 3. Repository Pattern
+Very repetitive code turns to abstraction, using **Repository pattern**.
 
-**Purpose:**
-To isolate data access logic, promoting modularity and easier testing.
+- Instead of tightly coupling your code to a concrete implementation (class), you write code that depends on an **interface** (an abstraction).
+- This makes your code **flexible**, **testable**, and **easier to change** in the future.
 
-**Steps:**
-1. Create repository interfaces (e.g., `IRepository<T>`).
-2. Implement these interfaces to encapsulate database operations.
-3. Register repositories in `Program.cs` using scoped lifetimes:
-   ```csharp
-   builder.Services.AddScoped<IRepository<Comment>, Repository<Comment>>();
-   ```
 
----
+**Abstraction** - hiding piece of code within another method.
 
-## 4. DTOs and Validation
+## Repository Pattern
+- **What it means**:
+   - A design pattern used to separate the **data access logic** (e.g., database queries) from the **business logic** of your application.
+   - Instead of directly dealing with database queries inside your controllers/services, you use a repository to **encapsulate common data operations**.
 
-**Purpose:**
-DTOs (Data Transfer Objects) streamline the transfer of data between layers and shield sensitive information.
+- **Why use it?**:
+   - Makes your code more structured and reusable.
+   - Makes testing easier (e.g., mock repositories instead of using a real database).
 
-**Steps:**
-- Design specific DTOs for request payloads and response objects.
-- Annotate properties with validation attributes:
+
+## Dependency Injection (DI)
+- **What it means**:
+   - **Dependency Injection** is a technique where objects or services (dependencies) are **provided to a class**, rather than the class creating them itself.
+   - This allows your code to depend on abstractions (like interfaces) and makes it easier to change implementations or perform tests.
+
+- **Why use it?**:
+   - Makes your code more modular, testable, and maintainable.
+   - Decouples classes from concrete implementations.
+
+- **How it works**:
+   - Register services/interfaces in the **Dependency Injection container**.
+   - The container **injects the dependencies** into classes that need them.
+
+- **Analogy**:
+   - Imagine a restaurant: You sit at your table (controller), and the waiter (DI container) brings the food (dependency) you ordered. You don’t go to the kitchen (implementation) yourself.
+
+Example with `CommentController`:
+- Interfaces are being injected into the `CommentController` using its constructor;
+- The dependencies (`ICommentRepository`, `IStockRepository`) are provided by the DI container when creating an instance of `CommentController`;
+- For example:
   ```csharp
-  public class CreateUserRequest
-  {
-      [Required]
-      [EmailAddress]
-      public string Email { get; set; }
-
-      [Required]
-      [MinLength(6)]
-      public string Password { get; set; }
-  }
+  builder.Services.AddScoped<ICommentRepository, CommentRepository>();
   ```
-- Use libraries like AutoMapper to map between DTOs and entities.
+- `AddScoped()` method registers the dependencies in the DI container and ensures that a new instance of the service is created for each HTTP request.
+## Data Validation
 
----
+### Data validation for URL and JSON (_from body_)
 
-## 5. Controllers and Endpoints
+For simple types, where we pass `string` instead of `int`:
+```csharp
+[HttpGet("{id}")]
+public async Task<IActionResult> GetById([FromRoute] int id) {}
+```
+This should not pass the validation, since we typed `id` as an `int` type value.
+```csharp
+[HttpGet("{id: int}")]
+public async Task<IActionResult> GetById([FromRoute] int id) {}
+```
 
-**Purpose:**
-Controllers act as the entry point for client interactions, handling HTTP requests and responses.
+### Complex Forms of validation
 
-**Steps:**
-1. Create controllers segregating logic by domain or feature.
-2. Use RESTful conventions (e.g., `GET`, `POST`, `PUT`, `DELETE`).
-3. Include meaningful HTTP responses (`200 OK`, `404 Not Found`, etc.).
-4. Secure endpoints using `[Authorize]` attribute where required.
+Inside DTOs, put **Data Validation Annotations** on top of our actual properties.
 
----
+Recommendation: Never put Data Validation Annotations inside a real model! It will apply globally.
+`[Required]`, `[MinLength(int, ErrorMessage = string)]`, `[MaxLength(int, ErrorMessage = string)]`, `[Range(1, 1000)]`
 
-## 6. Authorization and Authentication
+## Filtering
 
-**Purpose:**
-Implement security measures to restrict access to authorized users and define policies based on roles or claims.
+`ToList()` is very important, because it is what generates an SQL - pretty much it fires a gun to the db to get data back.
 
-**Steps:**
-1. Implement JWT-based authentication to issue secure tokens upon user login.
-2. Populate tokens with user claims for flexibility and scalability.
-3. Secure endpoints using claims-based policies:
-   ```csharp
-   [Authorize(Policy = "AdminOnly")]
-   public IActionResult AdminEndpoint() => Ok("Admin access granted.");
-   ```
+To defer this, we have `AsQueryable()` will delay firing SQL gun - so we can do filtering, limiting, or something else before we get the data.
 
----
+## Pagination
 
-## 7. Features and Justifications
+Using `Skip(int)` and `Take(int)` in combination.
 
-- **Pagination:** Dividing large datasets for optimized performance during retrieval.
-    - Implementation: `Skip()` and `Take()` methods combined with sorting.
-- **Filtering:** Dynamically crafting queries for selective data access.
-    - Implementation: Use `AsQueryable()` for deferred execution.
-- **Token Services:** Securing user sessions and defining granular access levels using JWT claims.
-- **Dependency Injection (DI):** Reducing tight coupling of components to improve testability and scalability.
+## Token Services
+### Claims vs. Roles
 
----
+**Roles** are more generic and old school.
 
-## 8. Application Architecture
+**Claims** don't require DB and very flexible.
 
-**Purpose:**
-Maintain separation of concerns to simplify maintenance and future development.
+Microsoft has moved away from Roles.
 
-## 9. Dependency Injection (DI)
+Claims are (just as Roles) key-value pairs of things that going to describe of what a user does or what a user can do.
 
-**Purpose:**
-DI facilitates the loose coupling of components and promotes modular design.
+Flow:
 
-**Key Steps:**
-1. Register dependencies in the DI container using `AddScoped`, `AddTransient`, or `AddSingleton` based on lifetime requirements.
-2. Inject dependencies into controllers, services, or other layers via constructors.
+- When user do Login, submitting email and password - sending JWT to the server;
+- Claims Principal: when User is authenticated, Claims Principal is going to be created;
+- From Claims Principal we are going to get information about User such: email, timeZone, etc...
 
----
-
-## 10. Development Practices and Notes
-
-**Best Practices:**
-- Write clean and modular code, adhering to the principles of SOLID.
-- Use interfaces to abstract implementations and increase flexibility.
-- Keep controllers thin, delegating all logic to services or repositories.
-- Consistently test components using mock implementations.
-
-**Additional Notes:**
-- Ensure sensitive data, such as connection strings and secrets, are stored securely in environment variables.
-- Regularly update NuGet packages and .NET versions to leverage new features and security patches.
-
----
-
-This markdown file should serve as a comprehensive guide for understanding and contributing to the application. It ensures clarity, consistency, and traceability of development practices for future contributors.
-
-
-
-# Building a Web API from Scratch - Step-by-Step Guide
-
-This markdown file provides a comprehensive step-by-step guide to building a Web API application using ASP.NET Core. It covers all key stages from project setup to development and deployment.
-
-## Screenshots and Visual Documentation
-
-### Screenshot 1: API Endpoints
-
-![Application Overview](./Screens/screen-01.png)
-Documentation of available API endpoints and their respective HTTP methods.
-
-### Screenshot 2: API Endpoints
-
-![Database Schema](./Screens/screen-02.png)
-Documentation of available API endpoints and their respective HTTP methods.
-
-### Screenshot 3: Database Schema
-
-![API Endpoints](./Screens/screen-03.png)
-Visual representation of the database schema and relationships between entities.
-
----
-
-## 1. Initial Setup
-
-1. Create a new Web API project using the .NET CLI or Visual Studio:
-   ```bash
-   dotnet new webapi -n YourProjectName
-   cd YourProjectName
-   ```
-2. (Optional) Configure `launchSettings.json` if needed for debugging purposes.
-
----
-
-## 2. Database Setup
-
-1. Install required NuGet packages:
-   ```bash
-   dotnet add package Microsoft.EntityFrameworkCore
-   dotnet add package Microsoft.EntityFrameworkCore.SqlServer
-   ```
-2. Create a `DbContext` class (e.g., `ApplicationDbContext`) to manage interactions with the database.
-3. Update the `appsettings.json` with your connection string:
-   ```json
-   "ConnectionStrings": {
-       "DefaultConnection": "YourDatabaseConnectionString"
-   }
-   ```
-4. Configure the `DbContext` in `Program.cs`:
-   ```csharp
-   builder.Services.AddDbContext<ApplicationDbContext>(options =>
-       options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-   ```
-5. Run migrations to initialize your database:
-   ```bash
-   dotnet ef migrations add InitialMigration
-   dotnet ef database update
-   ```
-
----
-
-## 3. Models (Entities)
-
-1. Define plain C# classes that represent your database tables.
-2. Configure relationships (e.g., One-To-Many, Many-To-Many) using navigation properties.
-3. Use Data Annotations or Fluent API to apply entity configurations as needed.
-
----
-
-## 4. Implement the Repository Pattern
-
-1. Define repository interfaces (e.g., `IRepository<T>`).
-2. Implement repository logic to handle the database operations for each entity.
-3. Register repository services in dependency injection (DI) within `Program.cs`:
-   ```csharp
-   builder.Services.AddScoped<IRepository<T>, Repository<T>>();
-   ```
-
----
-
-## 5. Authentication and Authorization
-
-1. Install required NuGet packages for authentication:
-   ```bash
-   dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer
-   dotnet add package Microsoft.AspNetCore.Identity
-   ```
-2. Configure Identity for user management in `Program.cs`:
-   ```csharp
-   builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
-   {
-       options.Password.RequireDigit = true;
-       options.Password.RequireNonAlphanumeric = true;
-       options.Password.RequiredLength = 12;
-   }).AddEntityFrameworkStores<ApplicationDbContext>();
-   ```
-3. Set up JWT Authentication:
-    - Define JWT configurations in `appsettings.json`.
-    - Configure JWT in `Program.cs`:
-      ```csharp
-      builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-        .AddJwtBearer(options =>
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = builder.Configuration["JWT:Issuer"],
-                ValidAudience = builder.Configuration["JWT:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"]))
-            };
-        });
-      ```
-
----
-
-## 6. Controllers and Endpoints
-
-1. Create controllers for each major domain or feature.
-2. Follow REST principles:
-    - `GET` for reading data.
-    - `POST` for creating data.
-    - `PUT` for updating data.
-    - `DELETE` for removing data.
-3. Example controller:
-   ```csharp
-   [ApiController]
-   [Route("api/[controller]")]
-   public class ExampleController : ControllerBase
-   {
-       private readonly IRepository<Example> _repository;
-
-       public ExampleController(IRepository<Example> repository)
-       {
-           _repository = repository;
-       }
-
-       [HttpGet]
-       public async Task<IActionResult> GetAll() => Ok(await _repository.GetAllAsync());
-   }
-   ```
-
----
-
-## 7. Use DTOs and Validate Data
-
-1. Use Data Transfer Objects (DTOs) for request/response payloads.
-2. Add validation attributes to DTOs for input validation:
-   ```csharp
-   public class CreateExampleDto
-   {
-       [Required]
-       public string Name { get; set; }
-   }
-   ```
-3. Install and configure `AutoMapper` to map DTOs to entities:
-   ```bash
-   dotnet add package AutoMapper.Extensions.Microsoft.DependencyInjection
-   ```
-
----
-
-## 8. Enable Documentation
-
-1. Install Swagger for API documentation:
-   ```bash
-   dotnet add package Swashbuckle.AspNetCore
-   ```
-2. Configure Swagger in `Program.cs`:
-   ```csharp
-   builder.Services.AddSwaggerGen();
-   ```
-3. Add middleware to serve Swagger UI (only in development environment):
-   ```csharp
-   if (app.Environment.IsDevelopment())
-   {
-       app.UseSwagger();
-       app.UseSwaggerUI();
-   }
-   ```
-
----
-
-## 9. Testing
-
-1. Unit test repositories and services using tools like `xUnit` and `Moq`.
-2. Integration test controllers using in-memory DB or external testing tools (Postman, Swagger).
-
----
-
-## 10. Additional Features
-
-- **Pagination:** Implement with `Skip()` and `Take()` for performance improvement.
-- **Filtering:** Use `AsQueryable()` to delay execution until necessary filtering is applied.
-- **Global Exception Handling:** Add middleware to handle errors consistently.
-
----
-
-## Final Steps Checklist
-
-1. **Set up the project:** Verify that `DbContext`, entities, and configurations are in place.
-2. **Apply patterns:** Use the Repository Pattern and Dependency Injection for clean code.
-3. **Secure the app:** Implement robust JWT-based Authentication.
-4. **Document:** Use Swagger/OpenAPI for comprehensive API documentation.
-5. **Validate:** Ensure robust input validation and meaningful error handling.
-6. **Test thoroughly:** Test every layer from unit tests to integration tests.
-
----
-
-This markdown file provides all the necessary steps for building a secure, testable, and robust Web API in ASP.NET Core. Follow it step-by-step to ensure success in building scalable and maintainable APIs.
+Making `Service` folder. `Repository` folder is for DB calls, while on the other hand `Service` is for any kind of abstraction.
