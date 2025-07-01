@@ -9,7 +9,7 @@ namespace api.Repository;
 
 public class CommentRepository : ICommentRepository
 {
-  // Dependecy Injection in action
+  // Dependency Injection in action
   private readonly ApplicationDbContext _context;
   public CommentRepository(ApplicationDbContext context)
   {

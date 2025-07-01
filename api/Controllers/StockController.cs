@@ -14,13 +14,9 @@ namespace api.Controllers;
 [ApiController]
 public class StockController : ControllerBase
 {
-  // We do not want to leave context mutable
-  private readonly ApplicationDbContext _context;
   private readonly IStockRepository _stockRepository;
-
-  public StockController(ApplicationDbContext context, IStockRepository stockRepository)
+  public StockController(IStockRepository stockRepository)
   {
-    _context = context;
     _stockRepository = stockRepository;
   }
 
@@ -28,6 +24,7 @@ public class StockController : ControllerBase
   [Authorize]
   public async Task<IActionResult> GetAllStocks([FromQuery] QueryObject query)
   {
+    // Validation according to what I set within the Model
     if (!ModelState.IsValid)
     {
       return BadRequest(ModelState);
@@ -35,14 +32,20 @@ public class StockController : ControllerBase
 
     // without ToList - returning list as an object (Deffer execution);
     var stocks = await _stockRepository.GetAllAsync(query);
+    // Limit information that we show/send to the end-user
     var stockDto = stocks.Select(s => s.ToStockDto()).ToList();
 
     return Ok(stockDto);
   }
 
-  [HttpGet("{id:int}")] // read by the id (id from query)
+  [HttpGet("{id:int}")] // read by the id (id from a query)
   public async Task<IActionResult> GetStockById([FromRoute] int id)
   {
+    if (!ModelState.IsValid)
+    {
+      return BadRequest(ModelState);
+    }
+
     var stock = await _stockRepository.GetByIdAsync(id);
 
     if (stock == null)

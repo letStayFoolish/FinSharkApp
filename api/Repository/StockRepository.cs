@@ -10,14 +10,13 @@ namespace api.Repository;
 
 public class StockRepository : IStockRepository
 {
+  // Dependency Injection
   private readonly ApplicationDbContext _context;
-
   public StockRepository(ApplicationDbContext context)
   {
     // DI - this is how we bring the database before actually use any of it 
     _context = context;
   }
-
   public async Task<List<Stock>> GetAllAsync(QueryObject query)
   {
     // before adding filtering functionality:
@@ -47,17 +46,14 @@ public class StockRepository : IStockRepository
 
     return await stocks.Skip(skipNumber).Take(query.PageSize).ToListAsync();
   }
-
   public async Task<Stock?> GetByIdAsync(int id)
   {
     return await _context.Stocks.Include(item => item.Comments).FirstOrDefaultAsync(s => s.Id == id);
   }
-
   public async Task<Stock?> GetBySymbolAsync(string symbol)
   {
     return await _context.Stocks.FirstOrDefaultAsync(s => s.Symbol == symbol);
   }
-
   public async Task<Stock> CreateAsync(Stock stockModel)
   {
     await _context.AddAsync(stockModel);
@@ -65,7 +61,6 @@ public class StockRepository : IStockRepository
 
     return stockModel;
   }
-
   public async Task<Stock?> UpdateAsync(int id, UpdateStockRequestDto stockDto)
   {
     var existingStock = await _context.Stocks.FirstOrDefaultAsync(s => s.Id == id);
@@ -87,22 +82,20 @@ public class StockRepository : IStockRepository
 
     return existingStock;
   }
-
   public async Task<Stock?> DeleteAsync(int id)
   {
-    var stockModel = await _context.Stocks.FirstOrDefaultAsync(s => s.Id == id);
+    var existingStock = await _context.Stocks.FirstOrDefaultAsync(s => s.Id == id);
 
-    if (stockModel == null)
+    if (existingStock == null)
     {
       return null;
     }
 
-    _context.Remove(stockModel);
+    _context.Remove(existingStock);
     await _context.SaveChangesAsync();
 
-    return stockModel;
+    return existingStock;
   }
-
   public async Task<bool> DeleteAllAsync()
   {
     var allStocks = await _context.Stocks.ToListAsync();
@@ -111,8 +104,7 @@ public class StockRepository : IStockRepository
 
     return true;
   }
-
-  public async Task<bool> StockExists(int id)
+  public async Task<bool> StockExistsAsync(int id)
   {
     return await _context.Stocks.AnyAsync(stock => stock.Id == id);
   }

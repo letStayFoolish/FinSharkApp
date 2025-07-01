@@ -31,6 +31,7 @@ public static class StockMappers
       LastDiv = stockRequestDto.LastDiv,
       Industry = stockRequestDto.Industry,
       MarketCap = stockRequestDto.MarketCap,
+      Comments = []
     };
   }
 }

@@ -39,7 +39,7 @@ public class CommentController : ControllerBase
     }
 
     var comments = await _commentRepository.GetAllAsync();
-    // DTO Comments: Mapping through each of comment and turn it to DTO comment (we do not want to show all to the end-user)
+    // DTO Comments: Mapping through each of the comments and turn it to DTO comment (we do not want to show all to the end-user)
     var commentsDto = comments.Select(c => c.ToCommentDto());
     return Ok(commentsDto);
   }
@@ -73,7 +73,7 @@ public class CommentController : ControllerBase
     }
 
     // find existing stock
-    var existingStock = await _stockRepository.StockExists(stockId);
+    var existingStock = await _stockRepository.StockExistsAsync(stockId);
     if (!existingStock)
     {
       return BadRequest("Stock does not exist");
@@ -126,6 +126,6 @@ public class CommentController : ControllerBase
       return NotFound("Comment not found");
     }
 
-    return Ok(commentModel);
+    return NoContent();
   }
 }

@@ -16,7 +16,7 @@ public class PortfolioRepository : IPortfolioRepository
     _context = context;
   }
 
-  public async Task<List<Stock>> GetUserPortfolio(AppUser user)
+  public async Task<List<Stock>> GetUserPortfolioAsync(AppUser user)
   {
     return await _context.Portfolios.Where(p => p.AppUserId == user.Id).Select(stock => new Stock
     {

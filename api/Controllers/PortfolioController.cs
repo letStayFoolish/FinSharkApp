@@ -35,7 +35,7 @@ public class PortfolioController : ControllerBase
 
     var appuser = await _appUserManager.FindByNameAsync(username);
 
-    var userPortfolio = await _portfolioRepo.GetUserPortfolio(appuser);
+    var userPortfolio = await _portfolioRepo.GetUserPortfolioAsync(appuser);
     return Ok(userPortfolio);
   }
 
@@ -53,7 +53,7 @@ public class PortfolioController : ControllerBase
       return NotFound("Stock not found");
     }
 
-    var userPortfolio = await _portfolioRepo.GetUserPortfolio(appuser);
+    var userPortfolio = await _portfolioRepo.GetUserPortfolioAsync(appuser);
 
     if (userPortfolio.Any(p => string.Equals(p.Symbol, symbol, StringComparison.CurrentCultureIgnoreCase)))
     {
@@ -80,18 +80,18 @@ public class PortfolioController : ControllerBase
 
   [HttpDelete]
   [Authorize]
-  public async Task<IActionResult> Deleteportfolio(string Symbol)
+  public async Task<IActionResult> DeletePortfolio(string symbol)
   {
     var username = User.GetUsername();
     var appuser = await _appUserManager.FindByNameAsync(username);
-    var userPortfolio = await _portfolioRepo.GetUserPortfolio(appuser);
+    var userPortfolio = await _portfolioRepo.GetUserPortfolioAsync(appuser);
 
     var filteredStock =
-      userPortfolio.Where(p => string.Equals(p.Symbol, Symbol, StringComparison.CurrentCultureIgnoreCase)).ToList();
+      userPortfolio.Where(p => string.Equals(p.Symbol, symbol, StringComparison.CurrentCultureIgnoreCase)).ToList();
 
     if (filteredStock.Count == 1)
     {
-      await _portfolioRepo.DeleteAsync(appuser, Symbol);
+      await _portfolioRepo.DeleteAsync(appuser, symbol);
     }
     else
     {
