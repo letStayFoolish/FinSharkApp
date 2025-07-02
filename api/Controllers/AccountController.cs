@@ -48,8 +48,8 @@ public class AccountController : ControllerBase
     return Ok(
       new NewUserDto
       {
-        UserName = existingUser.UserName,
-        Email = existingUser.Email,
+        UserName = existingUser.UserName?? "",
+        Email = existingUser.Email ?? "",
         Token = _tokenService.CreateToken(existingUser)
       }
     );
@@ -81,8 +81,8 @@ public class AccountController : ControllerBase
           return Ok(
             new NewUserDto
             {
-              UserName = appUser.UserName,
-              Email = appUser.Email,
+              UserName = appUser.UserName?? "",
+              Email = appUser.Email?? "",
               Token = _tokenService.CreateToken(appUser)
             }
           );

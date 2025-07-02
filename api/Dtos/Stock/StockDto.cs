@@ -2,17 +2,16 @@
 
 namespace api.Dtos.Stock;
 
-public class StockDto
+public record StockDto
 {
-  
-  public int Id { get; set; }
-  public string Symbol { get; set; } = string.Empty;
-  public string CompanyName { get; set; } = string.Empty;
-  public decimal Purchase { get; set; } 
-  public decimal LastDiv { get; set; }
-  public string Industry { get; set; } = string.Empty;
-  public long MarketCap { get; set; }
+  public int Id { get; init; }
+  public string Symbol { get; init; } = string.Empty;
+  public string CompanyName { get; init; } = string.Empty;
+  public decimal Purchase { get; init; }
+  public decimal LastDiv { get; init; }
+  public string Industry { get; init; } = string.Empty;
+  public long MarketCap { get; init; }
   // Comments are secret (first part of the tutorial)
   // Now we can show comments
-  public List<CommentDto> Comments { get; set; }
+  public List<CommentDto> Comments { get; init; }
 }

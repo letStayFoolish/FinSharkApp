@@ -12,11 +12,13 @@ public class StockRepository : IStockRepository
 {
   // Dependency Injection
   private readonly ApplicationDbContext _context;
+
   public StockRepository(ApplicationDbContext context)
   {
     // DI - this is how we bring the database before actually use any of it 
     _context = context;
   }
+
   public async Task<List<Stock>> GetAllAsync(QueryObject query)
   {
     // before adding filtering functionality:
@@ -41,19 +43,22 @@ public class StockRepository : IStockRepository
         stocks = query.IsDescending ? stocks.OrderByDescending(s => s.Symbol) : stocks.OrderBy(s => s.Symbol);
       }
     }
-    
+
     var skipNumber = (query.PageNumber - 1) * query.PageSize;
 
     return await stocks.Skip(skipNumber).Take(query.PageSize).ToListAsync();
   }
+
   public async Task<Stock?> GetByIdAsync(int id)
   {
     return await _context.Stocks.Include(item => item.Comments).FirstOrDefaultAsync(s => s.Id == id);
   }
+
   public async Task<Stock?> GetBySymbolAsync(string symbol)
   {
     return await _context.Stocks.FirstOrDefaultAsync(s => s.Symbol == symbol);
   }
+
   public async Task<Stock> CreateAsync(Stock stockModel)
   {
     await _context.AddAsync(stockModel);
@@ -61,6 +66,7 @@ public class StockRepository : IStockRepository
 
     return stockModel;
   }
+
   public async Task<Stock?> UpdateAsync(int id, UpdateStockRequestDto stockDto)
   {
     var existingStock = await _context.Stocks.FirstOrDefaultAsync(s => s.Id == id);
@@ -82,6 +88,7 @@ public class StockRepository : IStockRepository
 
     return existingStock;
   }
+
   public async Task<Stock?> DeleteAsync(int id)
   {
     var existingStock = await _context.Stocks.FirstOrDefaultAsync(s => s.Id == id);
@@ -96,6 +103,7 @@ public class StockRepository : IStockRepository
 
     return existingStock;
   }
+
   public async Task<bool> DeleteAllAsync()
   {
     var allStocks = await _context.Stocks.ToListAsync();
@@ -104,6 +112,7 @@ public class StockRepository : IStockRepository
 
     return true;
   }
+
   public async Task<bool> StockExistsAsync(int id)
   {
     return await _context.Stocks.AnyAsync(stock => stock.Id == id);

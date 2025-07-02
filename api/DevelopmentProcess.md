@@ -113,3 +113,32 @@ Flow:
 - From Claims Principal we are going to get information about User such: email, timeZone, etc...
 
 Making `Service` folder. `Repository` folder is for DB calls, while on the other hand `Service` is for any kind of abstraction.
+
+## `IEnumerable<T>`
+
+`IEnumerable<T>` is an interface in C#. It represents a **collection of elements that can be enumerated (iterated over)**, one at a time, in a forward-only manner. Essentially, it serves as a base type for any sequence of data, like arrays, lists, or queries like those you see with LINQ.
+
+**Some Key Facts About `IEnumerable<T>`:**
+
+1. **Forward-Only Iteration:** You can use a `foreach` loop to iterate through items, but you can't move backward or access elements by index directly (like you can with a `List<T>` or array).
+2. **Lazy Elevation:** When used with LINQ queries (`AsQueryable()` in my code), it **doesn't execute (or fetch data)** until you explicitly need the data, for example, calling `ToList()` or enumerating it in a loop. This is efficient for dealing with large data or querying databases.
+3. **Common Base:** Many collection types (e.g. `List<T>`, `Array`, `Dictionary<T>`, LINQ queries against EF Core) implement `IEnumerable<T>`.
+
+**When to Use `IEnumerable<T>` Over Other Types?**
+
+1. **Return Type for Read-Only Iteration:** If you are writing a method that only needs to **return a sequence for iterating** without modifying it, prefer `IEnumerable,T>`. For example:
+```csharp
+public IEnumerable<int> GetNumbers() {
+    return new List<int> {1, 2, 3, 4 };
+}
+```
+This ensures consumers of your method can only iterate through the collection, not manipulate it directly (like adding/removing items).
+
+2. **Deferred Execution:** It is perfect for **querying data** from a database or any source where results shouldn't be materialized (fetched) immediately. In your example, the `_context.Stocks.AsQueryable()` part ensures the query is deferred. It fetches data from the database only when necessary (like when you call `ToListAsync()`).
+3. **Abstraction for Flexibility:** When you want to return a sequence but don't want to commit to a particular type (`List<T>`, `Array`, etc...), use `IEnumerable<T>`. It allows you to change implementations later without breaking the contract.
+
+**When Not to Use `IEnumerable<T>`?**
+
+- If you need to **modify the collection**, such as adding/removing elements, use `List<T>` or another mutable collection type.
+- If random access by index is required (like `list[i]`) use `List<T>` or an `array` because `IEnumerable<T>` does not support this.
+- If you need advanced operations like sorting or searching, `IEnumerable,T>` might not be the best choice; work with more specific type instead.
