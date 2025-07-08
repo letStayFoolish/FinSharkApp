@@ -8,13 +8,13 @@ _Source: [https://learn.microsoft.com/en-us/aspnet/core/fundamentals/?view=aspne
 ASP.NET Core apps created with the web templates contain the application startup code in `Program.cs` file.
 The `Program.cs` file is where:
 - **Services** required by the app are **configured**;
-- THe app's **request handling pipeline** is **defined** as a series of middleware components.
+- The app's **request handling pipeline** is **defined** as a series of middleware components.
 
 ### Dependency Injection (Services)
 
 When an ASP.NET Core app receives an HTTP request, the code handling the request sometimes needs to access other services.
 
-ASP.NET Core features built-in **dependency injection (DI)** that make configured services available throughout an app. Services are added to the DI Container with _WebApplicationBuilder.Services_ (`builder.Services`) in the code. When the **WebApplicationBuilder** is instantiated, many framework-provided services are automatically added. `builder` is a `WebApplicationBuilder` in the following code:
+ASP.NET Core features built-in **dependency injection (DI)** that makes configured services available throughout an app. Services are added to the DI Container with _WebApplicationBuilder.Services_ (`builder.Services`) in the code. When the **WebApplicationBuilder** is instantiated, many framework-provided services are automatically added. `builder` is a `WebApplicationBuilder` in the following code:
 ```csharp
 var builder = WebApplication.CreateBuilder(args);
 
@@ -76,7 +76,10 @@ Use the `AddSingleton` method to add a singleton service to the service containe
 
 ### Scoped Lifetime
 
-Services registered with **scoped lifetime** are created once per configured scope, which ASP.NET Core sets up for each request. A scoped service in ASP.NET Core is typically created when a request is received and disposed of when the request is completed. Useful when, for example, a service fetches customer's data from a database.
+Services registered with **scoped lifetime** are created once per configured scope, which ASP.NET Core sets up for each request. A scoped service in ASP.NET Core is typically created when a request is received and disposed of when the request is completed - A scoped service is created **once per HTTP request** in web applications. Useful when, for example, a service fetches customer's data from a database.
+
+The **same instance** is used throughout the scope of a **single request lifecycle**. This means that if multiple components within the same request require the scoped service, they receive the same instance.
+
 
 Use the `AddScoped` method to add a scoped service to the service container.
 
@@ -90,7 +93,7 @@ Use the `AddTransient` method to add a transient service to the service containe
 
 ### Middleware
 
-The **request handling pipeline** is composed as a **series of middleware components**. Each component performs operations on a **HttpContext** and either invokes next middleware in the pipeline or terminates the request.
+The **request handling pipeline** is composed as a **series of middleware components**. Each component performs operations on a **HttpContext** and either **invokes next middleware** in the pipeline or **terminates the request**.
 
 By convention, a middleware component is added to the pipeline by invoking a `Use{Feature}` extension method.
 
@@ -150,4 +153,19 @@ The `UseRouting(IApplicationBuilder)` method adds routing middleware to the requ
 ### Make HTTP Requests
 
 An implementation of `IHttpClientFactory` is available for creating `HttpClient` instances.
+
+# App startup in ASP.NET Core
+_Source: [https://learn.microsoft.com/en-us/aspnet/core/fundamentals/startup?view=aspnetcore-9.0](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/startup?view=aspnetcore-9.0)_
+
+ASP.NET Core apps created with the web templates contain the application startup code in the `Program.cs` file.
+
+## Extend Startup with startup files
+
+Use `IStartupFilter`:
+- To configure middleware at the beginning or at the end of an app's middleware pipeline without an explicit call to `Use{Middleware}`. Use `IStartupFilter` to add defaults to the beginning of the pipeline without explicitly registering the default middleware. `IStartupFilter` allows a different component to call `Use{Middleware}` on behalf of the app author.
+- To create a pipeline of `Configure` methods. `IStartupFilter.Configure` can set a middleware to run before or after middleware added by libraries.
+
+An `IStartupFilter` implementation implements `Configure`, which receives and returns `Action<IApplicationBuilder>`. An `IApplicationBuilder` defines a class to configure an app's request pipeline.
+
+Each `IStartupFilter` implementation can add one or more middlewares in the request pipeline. The filters are invoked in the order they were added to the service container.
 

@@ -17,6 +17,7 @@ public class StockRepository : IStockRepository
   {
     // DI - this is how we bring the database before actually use any of it 
     _context = context;
+    Console.WriteLine("StockRepository instantiated!");
   }
 
   public async Task<List<Stock>> GetAllAsync(QueryObject query)
