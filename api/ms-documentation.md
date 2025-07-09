@@ -169,3 +169,25 @@ An `IStartupFilter` implementation implements `Configure`, which receives and re
 
 Each `IStartupFilter` implementation can add one or more middlewares in the request pipeline. The filters are invoked in the order they were added to the service container.
 
+# Dependency injection in ASP.NET Core
+_Source: [https://learn.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection?view=aspnetcore-9.0&source=recommendations](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection?view=aspnetcore-9.0&source=recommendations)_
+
+ASP.NET Core supports **Dependency Injection (DI)** software design pattern, which is a technique achieving **Inversion of Control (IoC)** between classes and their dependencies.
+
+## Overview of dependency injection
+
+A _dependency_ is an object that another object depends on.
+
+A class can directly create an instance of another class to make use of its method(s) (their dependency). This is not good, and would be better to avoid.
+
+Using a Dependency Injection pattern is a better choice because:
+- The use of an interface or a base class to abstract dependency implementation.
+- Registration of the dependency in a service container. ASP.NET Core provides built-in service container **IServiceProvider**. Services are typically registered in the app's `Program.cs` file.
+- _Injection_ of a service into the constructor of the class where it is used. The framework takes on the responsibility of creating an instance of the dependency and disposing it when it is no longer necessary (depending on Lifetime Service we choose).
+
+The collective set of dependencies that must be resolved is typically referred to as a _dependency tree_, _dependency graph_, or _object graph_.
+
+
+
+
+
