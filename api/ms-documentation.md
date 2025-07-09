@@ -187,6 +187,20 @@ Using a Dependency Injection pattern is a better choice because:
 
 The collective set of dependencies that must be resolved is typically referred to as a _dependency tree_, _dependency graph_, or _object graph_.
 
+# ASP.NET Core Middleware
+_Source: [https://learn.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-9.0](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-9.0)_
+
+Middleware is software that is assembled into an app pipeline to handle requests and response. Each component:
+- Chooses whether to pass the request to the next component in the pipeline.
+- Can perform work before and after the next component in the pipeline.
+
+**Request delegates** are used to build the request pipeline. The request delegates handle each HTTP request.
+
+Request delegates are configured using `Run`, `Map` and `Use` extension methods. An individual request delegate can be specified in-line as an anonymous method (in-line middleware), or it can be defined as in a reusable class. These methods are called _middleware_, or _middleware components_.
+
+# Write custom ASP.NET Core middleware
+_Source: [https://learn.microsoft.com/en-us/aspnet/core/fundamentals/middleware/write?view=aspnetcore-9.0](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/middleware/write?view=aspnetcore-9.0)_
+
 
 
 
